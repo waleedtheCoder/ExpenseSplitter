@@ -1,0 +1,32 @@
+<?php
+
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettlementController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/dashboard', function () {
+    return redirect()->route('groups.index');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::resource('groups', GroupController::class)->except(['edit', 'update']);
+    Route::post('/groups/{group}/members', [GroupController::class, 'addMember'])->name('groups.members.add');
+
+    Route::get('/groups/{group}/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('/groups/{group}/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::delete('/groups/{group}/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
+    Route::post('/groups/{group}/settlements', [SettlementController::class, 'store'])->name('settlements.store');
+});
+
+require __DIR__.'/auth.php';
