@@ -19,7 +19,7 @@ A group expense tracking app built with Laravel, similar to Splitwise. Members l
 
 ## Tech Stack
 
-* Laravel 11
+* Laravel 12
 * Blade with Laravel Breeze for authentication
 * Tailwind CSS
 * Pest for testing
