@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\AiUnavailableException;
 use App\Models\Expense;
 use App\Models\Group;
+use App\Services\ExpenseAiService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,17 +14,17 @@ use Illuminate\View\View;
 
 class ExpenseController extends Controller
 {
-    public function create(Group $group): View
+    public function create(Group $group, ExpenseAiService $ai): View
     {
         $this->authorize('addExpense', $group);
 
         $group->load('members');
 
-        return view('expenses.create', compact('group'));
+        return view('expenses.create', ['group' => $group, 'aiEnabled' => $ai->enabled()]);
     }
 
     /** Creates the expense and splits it evenly (in cents) across the chosen participants. */
-    public function store(Request $request, Group $group): RedirectResponse
+    public function store(Request $request, Group $group, ExpenseAiService $ai): RedirectResponse
     {
         $this->authorize('addExpense', $group);
 
@@ -34,13 +36,24 @@ class ExpenseController extends Controller
             'paid_by' => ['required', 'integer', Rule::in($memberIds)],
             'participant_ids' => ['required', 'array', 'min:1'],
             'participant_ids.*' => [Rule::in($memberIds)],
+            'category' => ['nullable', Rule::in(Expense::CATEGORIES)],
         ]);
+
+        // "Auto" in the picker: let Claude choose. Saving never fails because the AI is down.
+        if (empty($data['category']) && $ai->enabled()) {
+            try {
+                $data['category'] = $ai->categorise($data['description']);
+            } catch (AiUnavailableException) {
+                $data['category'] = null;
+            }
+        }
 
         DB::transaction(function () use ($group, $data) {
             $expense = $group->expenses()->create([
                 'paid_by' => $data['paid_by'],
                 'description' => $data['description'],
                 'amount' => $data['amount'],
+                'category' => $data['category'] ?? null,
             ]);
 
             $totalCents = (int) round($data['amount'] * 100);

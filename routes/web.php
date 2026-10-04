@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AiExpenseController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettlementController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +27,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/groups/{group}/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
     Route::post('/groups/{group}/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::delete('/groups/{group}/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
+    Route::post('/groups/{group}/expenses/ai/receipt', [AiExpenseController::class, 'scanReceipt'])
+        ->middleware('throttle:20,1')->name('expenses.ai.receipt');
+    Route::post('/groups/{group}/expenses/ai/text', [AiExpenseController::class, 'parseText'])
+        ->middleware('throttle:20,1')->name('expenses.ai.text');
+
+    Route::get('/groups/{group}/insights', [InsightsController::class, 'show'])->name('groups.insights');
+    Route::post('/groups/{group}/insights', [InsightsController::class, 'generate'])
+        ->middleware('throttle:10,1')->name('groups.insights.generate');
 
     Route::post('/groups/{group}/settlements', [SettlementController::class, 'store'])->name('settlements.store');
 });

@@ -23,6 +23,9 @@
                 <a href="{{ route('expenses.create', $group) }}" class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">
                     + Add Expense
                 </a>
+                <a href="{{ route('groups.insights', $group) }}" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50">
+                    Insights
+                </a>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -98,6 +101,7 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid By</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Split Between</th>
@@ -108,6 +112,7 @@
                         @forelse ($group->expenses->sortByDesc('created_at') as $expense)
                             <tr>
                                 <td class="px-6 py-3 text-sm text-gray-900">{{ $expense->description }}</td>
+                                <td class="px-6 py-3 text-sm text-gray-500">{{ $expense->category ?? '—' }}</td>
                                 <td class="px-6 py-3 text-sm text-gray-500">{{ $expense->payer->name }}</td>
                                 <td class="px-6 py-3 text-sm text-gray-900">${{ number_format($expense->amount, 2) }}</td>
                                 <td class="px-6 py-3 text-sm text-gray-500">{{ $expense->shares->count() }} people</td>
@@ -121,7 +126,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-sm text-gray-500 text-center">No expenses logged yet.</td>
+                                <td colspan="6" class="px-6 py-4 text-sm text-gray-500 text-center">No expenses logged yet.</td>
                             </tr>
                         @endforelse
                     </tbody>
