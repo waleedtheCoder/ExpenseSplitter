@@ -25,6 +25,7 @@ class DemoDataSeeder extends Seeder
         $dinner = $group->expenses()->create([
             'paid_by' => $alice->id,
             'description' => 'Dinner out',
+            'category' => 'Food & Drink',
             'amount' => 90.00,
         ]);
         $dinner->shares()->createMany([
@@ -37,6 +38,7 @@ class DemoDataSeeder extends Seeder
         $groceries = $group->expenses()->create([
             'paid_by' => $bob->id,
             'description' => 'Groceries',
+            'category' => 'Groceries',
             'amount' => 60.00,
         ]);
         $groceries->shares()->createMany([
@@ -51,6 +53,7 @@ class DemoDataSeeder extends Seeder
         $utilities = $group->expenses()->create([
             'paid_by' => $dave->id,
             'description' => 'Utility bill',
+            'category' => 'Utilities',
             'amount' => 100.00,
         ]);
         $utilities->shares()->createMany([

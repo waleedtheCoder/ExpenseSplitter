@@ -11,11 +11,25 @@ class Expense extends Model
 {
     use HasFactory;
 
+    /** Fixed set of categories the AI (and the manual picker) chooses from. */
+    public const CATEGORIES = [
+        'Food & Drink',
+        'Groceries',
+        'Rent',
+        'Utilities',
+        'Transport',
+        'Travel',
+        'Entertainment',
+        'Shopping',
+        'Other',
+    ];
+
     protected $fillable = [
         'group_id',
         'paid_by',
         'description',
         'amount',
+        'category',
     ];
 
     protected function casts(): array
